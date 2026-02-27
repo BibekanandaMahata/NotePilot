@@ -2,7 +2,10 @@
   "manifest_version": 3,
   "name": "NotePilot",
   "version": "1.0.0",
-  "permissions": ["storage", "sidePanel"],
+  "permissions": [
+    "storage",
+    "sidePanel"
+  ],
   "side_panel": {
     "default_path": "sidepanel.html"
   },
@@ -11,7 +14,6 @@
     "type": "module"
   },
   "action": {
-    "default_popup": "sidepanel.html", 
     "default_title": "Open NotePilot"
   }
 }

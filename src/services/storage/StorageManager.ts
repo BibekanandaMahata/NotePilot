@@ -17,7 +17,7 @@ class StorageManager {
 
   constructor() {
     // Default to Local. In the future, check user settings here.
-    this.adapter = new LocalAdapter(); 
+    this.adapter = new LocalAdapter();
   }
 
   async saveNote(note: Note) {
@@ -41,7 +41,7 @@ class LocalAdapter implements IStorageAdapter {
 
   async getNotes(): Promise<Note[]> {
     const result = await chrome.storage.local.get("notes");
-    return result.notes || [];
+    return (result.notes as Note[]) || [];
   }
 }
 

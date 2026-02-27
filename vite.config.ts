@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   resolve: {
     alias: { '@': resolve(__dirname, 'src') },
   },
@@ -11,7 +12,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         sidepanel: resolve(__dirname, 'sidepanel.html'),
-        background: resolve(__dirname, 'src/background/index.ts'),
       },
       output: {
         entryFileNames: '[name].js',

@@ -22,7 +22,7 @@ It leverages the Chrome **Side Panel API** to keep notes persistent alongside br
 
 ## 🏗️ Tech Stack
 
-- **Core:** [React 18](https://react.dev/), [TypeScript](https://www.typescriptlang.org/)
+- **Core:** [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/)
 - **Build Tool:** [Vite](https://vitejs.dev/) (Optimized for Manifest V3)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/)
 - **Icons:** [Lucide React](https://lucide.dev/)
