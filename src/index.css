@@ -1,1 +1,125 @@
 @import "tailwindcss";
+
+@theme {
+    /* ── App Shell ── */
+    --color-app-bg: #3d4326;
+    --color-card-bg: #ffffff;
+
+    /* ── Brand / Accent ── */
+    --color-brand: #009688;
+    --color-brand-hover: #00796b;
+
+    /* ── Text ── */
+    --color-content: #1a1a1a;
+    --color-content-muted: #6b7280;
+    --color-content-placeholder: #9ca3af;
+    --color-tab-inactive: #9ca3af;
+
+    /* ── Surfaces ── */
+    --color-surface: #ffffff;
+    --color-surface-muted: #f3f4f6;
+
+    /* ── Borders / Dividers ── */
+    --color-border: #e5e7eb;
+
+    /* ── Note Card Neutral Palette ── */
+    --color-note-card-1: #ffffff;
+    /* pure white */
+    --color-note-card-2: #f8f9fa;
+    /* near-white */
+    --color-note-card-3: #f1f3f4;
+    /* Keep default gray */
+    --color-note-card-4: #e8eaed;
+    /* light gray */
+    --color-note-card-default: #f1f3f4;
+    /* fallback */
+
+    /* ── Scrollbar ── */
+    --color-scrollbar-thumb: #d1d5db;
+    --color-scrollbar-thumb-hover: #9ca3af;
+
+    /* ── Header accent tints (hover/active states) ── */
+    --color-header-icon-hover: #fefce8;
+    /* yellow-50 */
+    --color-header-icon-active: #fef9c3;
+    /* yellow-100 */
+
+    /* ── New Note button ── */
+    --color-new-btn-bg: #fef08a;
+    /* yellow-200 */
+    --color-new-btn-bg-hover: #fde047;
+    /* yellow-300 */
+    --color-new-btn-text: #713f12;
+    /* yellow-900 */
+
+    --font-body: 'Inter', var(--font-sans);
+}
+
+@layer base {
+    body {
+        background-color: var(--color-app-bg);
+        color: var(--color-content);
+        font-family: var(--font-body);
+    }
+}
+
+@layer utilities {
+
+    /* ── Custom Scrollbar ── */
+    .scrollbar-custom {
+        scrollbar-width: thin;
+        scrollbar-color: var(--color-scrollbar-thumb) transparent;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb {
+        background-color: var(--color-scrollbar-thumb);
+        border-radius: 999px;
+    }
+
+    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+        background-color: var(--color-scrollbar-thumb-hover);
+    }
+
+    /* ── Header icon states ── */
+    .icon-btn {
+        padding: 0.5rem;
+        border-radius: 9999px;
+        transition: background-color 0.15s ease;
+        color: var(--color-content);
+    }
+
+    .icon-btn:hover {
+        background-color: var(--color-header-icon-hover);
+    }
+
+    .icon-btn.active {
+        background-color: var(--color-header-icon-active);
+    }
+
+    /* ── New note button ── */
+    .btn-new-note {
+        background-color: var(--color-new-btn-bg);
+        color: var(--color-new-btn-text);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        padding: 0.375rem 0.75rem 0.375rem 0.625rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+        transition: all 0.15s ease;
+    }
+
+    .btn-new-note:hover {
+        background-color: var(--color-new-btn-bg-hover);
+    }
+}

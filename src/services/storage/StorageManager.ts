@@ -4,6 +4,8 @@ export interface Note {
   title: string;
   content: string;
   updatedAt: number;
+  color?: string;   // pastel card color (hex)
+  pageUrl?: string; // url of page note was created on (for 'Current page notes')
 }
 
 export interface IStorageAdapter {

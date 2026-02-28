@@ -1,8 +1,23 @@
 import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { Pencil, Save, ChevronLeft } from 'lucide-react';
 import { storage, type Note } from '../services/storage/StorageManager';
+import { NoteList } from './components/NoteList';
+import { NoteEditor } from './components/NoteEditor';
 import '@/index.css';
+
+// Reads note card colors from CSS variables (values live only in index.css)
+function getCssVar(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function getNoteColorPalette(): string[] {
+  return [
+    getCssVar('--color-note-card-1'),
+    getCssVar('--color-note-card-2'),
+    getCssVar('--color-note-card-3'),
+    getCssVar('--color-note-card-4'),
+  ];
+}
 
 const SidePanel = () => {
   const [view, setView] = useState<'list' | 'editor'>('list');
@@ -19,7 +34,16 @@ const SidePanel = () => {
   };
 
   const handleCreate = () => {
-    const newNote = { id: Date.now().toString(), title: '', content: '', updatedAt: Date.now() };
+    // Pick a random neutral color from the CSS-var-defined palette
+    const palette = getNoteColorPalette();
+    const color = palette[Math.floor(Math.random() * palette.length)];
+    const newNote: Note = {
+      id: Date.now().toString(),
+      title: '',
+      content: '',
+      updatedAt: Date.now(),
+      color,
+    };
     setActiveNote(newNote);
     setView('editor');
   };
@@ -32,55 +56,42 @@ const SidePanel = () => {
     }
   };
 
-  return (
-    <div className="h-screen bg-white text-gray-900 flex flex-col font-sans">
-      {/* HEADER */}
-      <div className="p-4 border-b flex justify-between items-center bg-gray-50">
-        <h1 className="font-bold text-lg flex items-center gap-2">
-          <Pencil size={18} className="text-blue-600" /> NotePilot
-        </h1>
-        {view === 'editor' && (
-          <button onClick={handleSave} className="text-blue-600 hover:text-blue-800">
-            <Save size={20} />
-          </button>
-        )}
-      </div>
+  const handleBack = () => {
+    setView('list');
+    setActiveNote(null);
+  };
 
-      {/* CONTENT */}
-      <div className="flex-1 overflow-y-auto p-4">
+  const handleDelete = async () => {
+    if (activeNote) {
+      const updatedNotes = notes.filter(n => n.id !== activeNote.id);
+      await chrome.storage.local.set({ notes: updatedNotes });
+      await loadNotes();
+      setView('list');
+      setActiveNote(null);
+    }
+  };
+
+  return (
+    <div className="h-screen w-full bg-app-bg flex items-stretch font-body overflow-hidden">
+      {/* White rounded card container */}
+      <div className="flex-1 bg-card-bg rounded-2xl overflow-hidden flex flex-col shadow-2xl">
         {view === 'list' ? (
-          <>
-            <button onClick={handleCreate} className="w-full bg-black text-white py-2 rounded-lg mb-4 font-medium">
-              + New Note
-            </button>
-            <div className="space-y-2">
-              {notes.map(note => (
-                <div key={note.id} onClick={() => { setActiveNote(note); setView('editor'); }}
-                  className="p-3 border rounded-lg hover:border-blue-500 cursor-pointer">
-                  <div className="font-bold">{note.title || 'Untitled Note'}</div>
-                  <div className="text-xs text-gray-500 truncate">{note.content || 'No content'}</div>
-                </div>
-              ))}
-            </div>
-          </>
+          <NoteList
+            notes={notes}
+            onCreateNote={handleCreate}
+            onSelectNote={(note) => {
+              setActiveNote(note);
+              setView('editor');
+            }}
+          />
         ) : (
-          <div className="flex flex-col h-full">
-            <button onClick={() => setView('list')} className="flex items-center text-sm text-gray-500 mb-2">
-              <ChevronLeft size={16} /> Back
-            </button>
-            <input
-              className="text-xl font-bold w-full outline-none mb-2 placeholder-gray-300"
-              placeholder="Title"
-              value={activeNote?.title}
-              onChange={e => setActiveNote({ ...activeNote!, title: e.target.value })}
-            />
-            <textarea
-              className="flex-1 w-full outline-none resize-none placeholder-gray-300"
-              placeholder="Start typing..."
-              value={activeNote?.content}
-              onChange={e => setActiveNote({ ...activeNote!, content: e.target.value })}
-            />
-          </div>
+          <NoteEditor
+            note={activeNote!}
+            onChange={setActiveNote}
+            onBack={handleBack}
+            onSave={handleSave}
+            onDelete={handleDelete}
+          />
         )}
       </div>
     </div>
