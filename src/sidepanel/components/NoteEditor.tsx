@@ -77,6 +77,11 @@ export const NoteEditor = ({ note, onChange, onBack, onSave, onDelete }: NoteEdi
                     value={note.title}
                     onChange={e => onChange({ ...note, title: e.target.value })}
                 />
+                <textarea
+                    className={`flex-1 w-full min-h-[400px] outline-none resize-none bg-transparent text-base leading-relaxed font-body ${textareaClass}`}
+                    value={note.content}
+                    onChange={e => onChange({ ...note, content: e.target.value })}
+                />
             </div>
         </div>
     );
