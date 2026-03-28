@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import { storage, type Note } from '../services/storage/StorageManager';
+import { storage, type Note, type Collection } from '../services/storage/StorageManager';
 import { NoteList } from './components/NoteList';
 import { NoteEditor } from './components/NoteEditor';
 import '@/index.css';
@@ -22,15 +22,23 @@ function getNoteColorPalette(): string[] {
 const SidePanel = () => {
   const [view, setView] = useState<'list' | 'editor'>('list');
   const [notes, setNotes] = useState<Note[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const [activeNote, setActiveNote] = useState<Note | null>(null);
+  const [originalNote, setOriginalNote] = useState<Note | null>(null);
 
   useEffect(() => {
     loadNotes();
+    loadCollections();
   }, []);
 
   const loadNotes = async () => {
     const loaded = await storage.getNotes();
     setNotes(loaded);
+  };
+
+  const loadCollections = async () => {
+    const loaded = await storage.getCollections();
+    setCollections(loaded);
   };
 
   const handleCreate = () => {
@@ -45,30 +53,72 @@ const SidePanel = () => {
       color,
     };
     setActiveNote(newNote);
+    setOriginalNote(newNote);
     setView('editor');
   };
 
   const handleSave = async () => {
     if (activeNote) {
-      await storage.saveNote({ ...activeNote, updatedAt: Date.now() });
-      await loadNotes();
-      setView('list');
+      // Auto-delete if both title and content are blank
+      if (!activeNote.title.trim() && !activeNote.content.trim()) {
+        await storage.deleteNote(activeNote.id);
+        await loadNotes();
+        setActiveNote(null);
+        setOriginalNote(null);
+        setView('list');
+      } else {
+        await storage.saveNote({ ...activeNote, updatedAt: Date.now() });
+        await loadNotes();
+        setOriginalNote(activeNote);
+      }
     }
   };
 
-  const handleBack = () => {
-    setView('list');
+  const handleBack = async () => {
+    if (activeNote) {
+      // Auto-delete if both title and content are blank
+      if (!activeNote.title.trim() && !activeNote.content.trim()) {
+        await storage.deleteNote(activeNote.id);
+        await loadNotes();
+      } else {
+        await storage.saveNote({ ...activeNote, updatedAt: Date.now() });
+        await loadNotes();
+      }
+    }
     setActiveNote(null);
+    setOriginalNote(null);
+    setView('list');
+  };
+
+  const handleDiscard = () => {
+    if (originalNote) {
+      setActiveNote(originalNote);
+    }
   };
 
   const handleDelete = async () => {
     if (activeNote) {
-      const updatedNotes = notes.filter(n => n.id !== activeNote.id);
-      await chrome.storage.local.set({ notes: updatedNotes });
+      await storage.deleteNote(activeNote.id);
       await loadNotes();
-      setView('list');
       setActiveNote(null);
+      setOriginalNote(null);
+      setView('list');
     }
+  };
+
+  const handleDeleteNote = async (noteId: string) => {
+    await storage.deleteNote(noteId);
+    await loadNotes();
+  };
+
+  const handleAddToCollection = async (noteId: string, collectionId: string) => {
+    await storage.addNoteToCollection(noteId, collectionId);
+    await loadNotes();
+  };
+
+  const handleRemoveFromCollection = async (noteId: string, collectionId: string) => {
+    await storage.removeNoteFromCollection(noteId, collectionId);
+    await loadNotes();
   };
 
   return (
@@ -78,11 +128,17 @@ const SidePanel = () => {
         {view === 'list' ? (
           <NoteList
             notes={notes}
+            collections={collections}
             onCreateNote={handleCreate}
             onSelectNote={(note) => {
               setActiveNote(note);
+              setOriginalNote(note);
               setView('editor');
             }}
+            onDeleteNote={handleDeleteNote}
+            onAddToCollection={handleAddToCollection}
+            onRemoveFromCollection={handleRemoveFromCollection}
+            loadCollections={loadCollections}
           />
         ) : (
           <NoteEditor
@@ -90,6 +146,7 @@ const SidePanel = () => {
             onChange={setActiveNote}
             onBack={handleBack}
             onSave={handleSave}
+            onDiscard={handleDiscard}
             onDelete={handleDelete}
           />
         )}
