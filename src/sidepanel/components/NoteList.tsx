@@ -107,14 +107,13 @@ function NoteContentPreview({ content, light }: { content: string; light: boolea
     );
 }
 
-function NoteCard({ note, onSelect, onDelete, collections, onAddToCollection, onRemoveFromCollection, onSwitchToCollectionsTab }: { 
+function NoteCard({ note, onSelect, onDelete, collections, onAddToCollection, onRemoveFromCollection }: { 
     note: Note; 
     onSelect: () => void; 
     onDelete: (noteId: string) => void;
     collections: Collection[];
     onAddToCollection: (noteId: string, collectionId: string) => void;
     onRemoveFromCollection: (noteId: string, collectionId: string) => void;
-    onSwitchToCollectionsTab?: () => void;
 }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [showCollectionsMenu, setShowCollectionsMenu] = useState(false);
@@ -188,19 +187,6 @@ function NoteCard({ note, onSelect, onDelete, collections, onAddToCollection, on
                                 onClick={() => setShowCollectionsMenu(false)}
                             >
                                 ← Back
-                            </button>
-                            <div className="border-t border-gray-100 my-1" />
-                            <button
-                                className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors flex items-center gap-2"
-                                onClick={() => {
-                                    setMenuOpen(false);
-                                    setShowCollectionsMenu(false);
-                                    // Switch to collections tab
-                                    onSwitchToCollectionsTab?.();
-                                }}
-                            >
-                                <FolderPlus size={14} />
-                                Create New Collection
                             </button>
                             <div className="border-t border-gray-100 my-1" />
                             {collections.length === 0 ? (
@@ -278,16 +264,11 @@ export const NoteList = ({ notes, collections, onCreateNote, onSelectNote, onDel
         loadCollections();
     };
 
-    const switchToCollectionsTab = () => {
-        setActiveTab('collections');
-        setShowCreateCollectionInline(true);
-    };
-
     return (
         <div className="flex flex-col h-full bg-card-bg overflow-hidden">
             {/* ── Header ── */}
             <div className="flex items-center justify-between px-4 py-3">
-                <h1 className="text-2xl italic text-content">Notes</h1>
+                <h1 className="text-xl font-semibold text-content">NotePilot</h1>
 
                 <div className="flex items-center gap-0.5">
                     {/* Utility icons - use .icon-btn utility class */}
@@ -306,14 +287,6 @@ export const NoteList = ({ notes, collections, onCreateNote, onSelectNote, onDel
                         title="Settings"
                     >
                         <Settings size={19} />
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('collections')}
-                        className={`icon-btn ${activeTab === 'collections' ? 'active' : ''}`}
-                        aria-label="Collections"
-                        title="Collections"
-                    >
-                        <Folder size={19} />
                     </button>
 
                     {/* Divider */}
@@ -417,7 +390,6 @@ export const NoteList = ({ notes, collections, onCreateNote, onSelectNote, onDel
                                             collections={collections}
                                             onAddToCollection={onAddToCollection}
                                             onRemoveFromCollection={onRemoveFromCollection}
-                                            onSwitchToCollectionsTab={switchToCollectionsTab}
                                         />
                                     ));
                                 })()}
@@ -532,7 +504,6 @@ export const NoteList = ({ notes, collections, onCreateNote, onSelectNote, onDel
                             collections={collections}
                             onAddToCollection={onAddToCollection}
                             onRemoveFromCollection={onRemoveFromCollection}
-                            onSwitchToCollectionsTab={switchToCollectionsTab}
                         />
                     ))
                 )}
